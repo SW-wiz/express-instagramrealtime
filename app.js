@@ -6,7 +6,7 @@ var instagram = require('instagram-node-lib');
 var app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // set the file name of the default layout
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
@@ -17,8 +17,8 @@ app.set('view engine', 'handlebars');
 // set the path to the front-end assets
 app.use(express.static('public'));
 
-var instagram_client_id = 'YOUR INSTAGRAM CLIENT ID';
-var instagram_client_secret = 'YOUR INSTAGRAM CLIENT SECRET';
+var instagram_client_id = 'a35b8b768af742fca896dabcc0da32bf';
+var instagram_client_secret = 'd6194381cb554df2b087fb39fb722701';
 
 instagram.set('client_id', instagram_client_id);
 instagram.set('client_secret', instagram_client_secret);
@@ -48,7 +48,7 @@ app.post('/tag/subscribe', function(req, res){
         console.log('unsubscribed from everything!');
         instagram.tags.subscribe({
           object_id: current_tag,
-          callback_url: 'https://xxxxxxxx.ngrok.io/subscribe',
+          callback_url: 'https://9c176eb1.ngrok.io/subscribe',
           complete: function(subscribe_data){
             if(subscribe_data){
               res.send({type: 'success'});
