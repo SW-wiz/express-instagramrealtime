@@ -24,22 +24,17 @@ instagram.set('client_id', instagram_client_id);
 instagram.set('client_secret', instagram_client_secret);
 
 var server = app.listen(4000, function(){
-
   var host = server.address().address;
   var port = server.address().port;
 
   console.log('Example app listening at http://%s:%s', host, port);
-
 });
 
 var io = require('socket.io').listen(server);
 
 app.get('/', function(req, res){
-
-    res.render('home');
-
+  res.render('home');
 });
-
 
 var current_tag;
 
