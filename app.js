@@ -39,61 +39,49 @@ app.get('/', function(req, res){
 var current_tag;
 
 app.post('/tag/subscribe', function(req, res){
+  current_tag = req.body.tag;
+  console.log('current tag: ' + current_tag);
 
-    current_tag = req.body.tag;
-
-    console.log('current tag: ' + current_tag);
-
-    instagram.tags.unsubscribe_all({
-        complete: function(unsubscribe_data) {
-            if(unsubscribe_data == null){
-                console.log('unsubscribed from everything!');
-
-                // subscribe to the new hashtag that the user has entered
-                instagram.tags.subscribe(
-                    {
-                        object_id: current_tag,
-                        //replace callback_url with your https ngrok url
-                        callback_url: 'https://xxxxxxxx.ngrok.io/subscribe',
-                        complete: function(subscribe_data){
-                            if(subscribe_data){ // check if response is valid
-
-                                res.send({type: 'success'});
-                            }
-                        }
-                    }
-                );
-
+  instagram.tags.unsubscribe_all({
+    complete: function(unsubscribe_data) {
+      if(unsubscribe_data == null){
+        console.log('unsubscribed from everything!');
+        instagram.tags.subscribe({
+          object_id: current_tag,
+          callback_url: 'https://xxxxxxxx.ngrok.io/subscribe',
+          complete: function(subscribe_data){
+            if(subscribe_data){
+              res.send({type: 'success'});
             }
-        }
-    });
-
-
+          }
+        });
+      }
+    }
+  });
 });
 
 app.get('/subscribe', function(req, res){
-
-    res.send(req.query['hub.challenge']);
+  res.send(req.query['hub.challenge']);
 });
 
 app.post('/subscribe', function(req, res){
 
-    // get the most recent photo posted which has the tag that the user has specified
-    instagram.tags.recent({
-        name: current_tag,
-        count: 1,
-        complete: function(data){
-            //store the data that you need
-            var photo = {
-                'user': data[0].user.username,
-                'profile_pic': data[0].caption.from.profile_picture,
-                'created_time': data[0].created_time,
-                'image': data[0].images.standard_resolution.url,
-                'caption': data[0].caption.text
-            };
-            //send it to the client-side
-            io.sockets.emit('new_photo', photo);
-        }
-    });
+  // get the most recent photo posted which has the tag that the user has specified
+  instagram.tags.recent({
+    name: current_tag,
+    count: 1,
+    complete: function(data){
+      //store the data that you need
+      var photo = {
+        'user': data[0].user.username,
+        'profile_pic': data[0].caption.from.profile_picture,
+        'created_time': data[0].created_time,
+        'image': data[0].images.standard_resolution.url,
+        'caption': data[0].caption.text
+      };
+      //send it to the client-side
+      io.sockets.emit('new_photo', photo);
+    }
+  });
 
 });
