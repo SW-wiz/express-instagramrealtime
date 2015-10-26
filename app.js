@@ -1,20 +1,21 @@
 var express = require('express');
-var app = express(); // create a new expressJS app
-
 var exphbs  = require('express-handlebars');
-
 var moment = require('moment');
-
 var bodyParser = require('body-parser');
-app.use(bodyParser.json()); // set the app to use the body parser
+var instagram = require('instagram-node-lib');
+var app = express();
+
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 
-app.engine('handlebars', exphbs({defaultLayout: 'main'})); // set the file name of the default layout
-app.set('view engine', 'handlebars'); // set the expressJS view engine to handlebars
+// set the file name of the default layout
+app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 
-app.use(express.static('public')); // set the path to the front-end assets
+// set the expressJS view engine to handlebars
+app.set('view engine', 'handlebars');
 
-var instagram = require('instagram-node-lib');
+// set the path to the front-end assets
+app.use(express.static('public'));
 
 var instagram_client_id = 'YOUR INSTAGRAM CLIENT ID';
 var instagram_client_secret = 'YOUR INSTAGRAM CLIENT SECRET';
@@ -55,13 +56,13 @@ app.post('/tag/subscribe', function(req, res){
 
                 // subscribe to the new hashtag that the user has entered
                 instagram.tags.subscribe(
-                    { 
+                    {
                         object_id: current_tag,
                         //replace callback_url with your https ngrok url
                         callback_url: 'https://xxxxxxxx.ngrok.io/subscribe',
                         complete: function(subscribe_data){
                             if(subscribe_data){ // check if response is valid
-                                
+
                                 res.send({type: 'success'});
                             }
                         }
@@ -81,9 +82,9 @@ app.get('/subscribe', function(req, res){
 });
 
 app.post('/subscribe', function(req, res){
-    
+
     // get the most recent photo posted which has the tag that the user has specified
-    instagram.tags.recent({ 
+    instagram.tags.recent({
         name: current_tag,
         count: 1,
         complete: function(data){
@@ -97,7 +98,7 @@ app.post('/subscribe', function(req, res){
             };
             //send it to the client-side
             io.sockets.emit('new_photo', photo);
-        } 
+        }
     });
 
 });
